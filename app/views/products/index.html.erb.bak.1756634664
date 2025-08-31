@@ -1,0 +1,15 @@
+<section class="section">
+  <h1 class="title">Products</h1>
+
+  <% if @products.blank? %>
+    <div class="notification is-info">No products yet.</div>
+  <% else %>
+    <div class="columns is-multiline">
+      <% @products.each do |product| %>
+        <div class="column is-one-third">
+          <%= render partial: "product_card", locals: { product: product } %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</section>

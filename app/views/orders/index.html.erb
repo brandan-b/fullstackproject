@@ -1,0 +1,43 @@
+<section class="section">
+  <h1 class="title">My Orders</h1>
+
+  <% if @orders.blank? %>
+    <div class="notification is-info">No orders yet.</div>
+    <%= link_to "Start shopping", products_path, class: "button is-primary" %>
+  <% else %>
+    <table class="table is-fullwidth is-striped">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Placed</th>
+          <th>Status</th>
+          <th class="has-text-right">Total</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+ <% @orders.each do |order| %>
+          <tr>
+            <td><%= order.id %></td>
+            <td><%= l(order.created_at, format: :short) rescue order.created_at.to_s %></td>
+            <td><%= order.try(:status) || "—" %></td>
+            <td class="has-text-right">
+              <%# Try several common total columns, fallback to computing from line_items if present %>
+              <% total =
+                   (order.try(:total_cents) && order.total_cents.to_f / 100.0) ||
+                   order.try(:total) ||
+                   order.try(:grand_total) ||
+                   nil %>
+              <% if total.present? %>
+                $<%= number_with_precision(total, precision: 2) %>
+              <% else %>
+                —
+              <% end %>
+            </td>
+            <td class="has-text-right"><%= link_to "View", order_path(order), class: "button is-small" %></td>
+          </tr>
+ <% end %>
+      </tbody>
+    </table>
+  <% end %>
+</section>

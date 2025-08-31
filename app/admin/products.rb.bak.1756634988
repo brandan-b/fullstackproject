@@ -1,0 +1,16 @@
+ActiveAdmin.register Product do
+  permit_params :title, :description, :price_cents, :stock, :active, category_ids: []
+
+  # Simple, safe filters
+  filter :id
+  filter :title
+  filter :price_cents
+  filter :created_at
+  filter :categories, as: :select, collection: -> { Category.order(:name) }
+
+  # Clear any auto-added filters that might poke into join internals
+  config.clear_sidebar_sections!
+  sidebar :filters do
+    active_admin_filters_form_for assigns[:search], filters: active_admin_config.filters
+  end
+end

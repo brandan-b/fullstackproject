@@ -1,0 +1,36 @@
+categories = [
+  { name: "Accessories" },
+  { name: "Apparel" },
+  { name: "Home & Living" }
+]
+
+categories.each do |attrs|
+  Category.find_or_create_by!(name: attrs[:name])
+end
+products = [
+  { name: "Canvas Tote Bag",       price: 19.99, category: "Accessories",  description: "Durable cotton tote for everyday carry." },
+  { name: "Stainless Water Bottle",price: 24.50, category: "Accessories",  description: "Insulated, keeps drinks cold or hot." },
+  { name: "Unisex Tee — Classic",  price: 15.00, category: "Apparel",      description: "Soft cotton, regular fit." },
+  { name: "Pullover Hoodie",       price: 39.00, category: "Apparel",      description: "Cozy fleece, kangaroo pocket." },
+  { name: "Ceramic Mug 12oz",      price: 9.99,  category: "Home & Living",description: "Dishwasher-safe, matte finish." },
+  { name: "Throw Pillow 18x18",    price: 22.00, category: "Home & Living",description: "Removable cover with zipper." },
+  { name: "Beanie Knit Hat",       price: 12.50, category: "Apparel",      description: "Warm, stretchy rib knit." },
+  { name: "Keychain Lanyard",      price: 6.00,  category: "Accessories",  description: "Clip-on with safety release." },
+  { name: "Scented Candle",        price: 14.75, category: "Home & Living",description: "Soy wax, cotton wick." },
+  { name: "Crew Socks (2-pack)",   price: 11.25, category: "Apparel",      description: "Breathable with arch support." }
+]
+products.each do |attrs|
+  cat = Category.find_by!(name: attrs.delete(:category))
+  Product.find_or_create_by!(name: attrs[:name]) do |p|
+    p.price = attrs[:price]
+    p.description = attrs[:description] if p.respond_to?(:description=)
+    # if you use categorizations join:
+    if p.respond_to?(:categories)
+      p.categories = [cat]
+    else
+      # if Product has category_id directly:
+      p.category_id = cat.id if p.respond_to?(:category_id=)
+    end
+  end
+end
+puts "Seeded #{Category.count} categories and #{Product.count} products."

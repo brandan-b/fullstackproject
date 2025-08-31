@@ -1,0 +1,104 @@
+class OrdersController < ApplicationController
+  before_action :authenticate_user!
+  before_action :set_cart_items, only: [:new, :create]
+  before_action :set_provinces,  only: [:new, :create]
+
+  def index
+    @orders = current_user.orders.order(created_at: :desc)
+  end
+
+  def show
+    @order = current_user.orders.find(params[:id])
+  end
+
+  def new
+    if @cart_items.blank?
+      redirect_to cart_path, alert: "Your cart is empty."
+      return
+    end
+    @order = current_user.orders.new
+  end
+
+  def create
+    if @cart_items.blank?
+      redirect_to cart_path, alert: "Your cart is empty."
+      return
+    end
+ province = Province.find_by(id: order_params[:province_id])
+    gst = province&.gst_rate.to_f
+    pst = province&.pst_rate.to_f
+    hst = province&.hst_rate.to_f
+
+    subtotal_cents = @cart_items.sum { |ci| ci[:line_cents] }
+    taxes_cents    = (subtotal_cents * (gst + pst + hst)).round
+    total_cents    = subtotal_cents + taxes_cents
+
+    @order = current_user.orders.new(order_params.merge(
+      subtotal_cents: subtotal_cents,
+      taxes_cents:    taxes_cents,
+      total_cents:    total_cents,
+      status:         "pending",
+      placed_at:      Time.current,
+      gst_rate:       gst,
+      pst_rate:       pst,
+      hst_rate:       hst
+    ))
+
+    if @order.save
+      # Persist line items only if the relation/model exists
+      if @order.respond_to?(:order_items)
+        @cart_items.each do |ci|
+          @order.order_items.create!(
+            product_id:  ci[:product].id,
+            quantity:    ci[:quantity],
+            price_cents: ci[:price_cents],
+            line_cents:  ci[:line_cents]
+          )
+        end
+      end
+
+      # clear cart
+      session[:cart] = {}
+
+  redirect_to order_path(@order), notice: "Order placed!"
+    else
+      flash.now[:alert] = @order.errors.full_messages.to_sentence.presence || "Could not place order."
+      @subtotal_cents = subtotal_cents
+      render :new, status: :unprocessable_entity
+    end
+  end
+
+  private
+
+  def order_params
+    params.require(:order).permit(
+      :first_name, :last_name, :address1, :address2,
+      :city, :postal_code, :country, :province_id
+    )
+  end
+
+def set_cart_items
+    raw = session[:cart] || {}
+    ids = raw.keys
+    @cart_items = []
+    Product.where(id: ids).find_each do |p|
+      qty = raw[p.id.to_s].to_i
+      next if qty <= 0
+      price_cents =
+        if p.respond_to?(:price_cents) && p.price_cents.present?
+          p.price_cents.to_i
+        elsif p.respond_to?(:price) && p.price.present?
+          (p.price.to_f * 100).to_i
+        else
+          0
+        end
+      line_cents = price_cents * qty
+      @cart_items << { product: p, quantity: qty, price_cents: price_cents, line_cents: line_cents }
+    end
+    @subtotal_cents = @cart_items.sum { |ci| ci[:line_cents] }
+  end
+
+def set_provinces
+    @provinces = Province.order(:name)
+  end
+end

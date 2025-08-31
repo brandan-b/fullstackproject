@@ -1,0 +1,26 @@
+Rails.application.routes.draw do
+  # admin auth + routes
+  devise_for :admin_users, ActiveAdmin::Devise.config
+  ActiveAdmin.routes(self)
+
+  # customer auth
+  devise_for :users
+
+  # store front
+  root "products#index"
+  resources :products, only: [:index, :show]
+  resources :orders,   only: [:new, :create, :show, :index]  # <-- keep this one
+
+  # cart is a single resource stored in session
+  resource :cart, only: [:show, :update, :destroy]
+
+  # keyword search (optionally scoped by category)
+  get "search", to: "search#index"
+
+  # simple cms pages editable in admin
+  get "/pages/:slug", to: "pages#show", as: :page
+
+  # optional health endpoint
+  get "up" => "rails/health#show", as: :rails_health_check
+end
+  resources :categories, only: [:index, :show]

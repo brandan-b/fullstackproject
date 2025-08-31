@@ -1,0 +1,16 @@
+<div class="card">
+  <div class="card-image" style="padding:1rem">
+    <% if product.image&.attached? %>
+      <%= image_tag product.image.variant(resize_to_limit: [400, 400]) rescue image_tag(product.image) %>
+    <% end %>
+  </div>
+<div class="card-content">
+    <p class="title is-6"><%= link_to product.title, product %></p>
+    <p><%= product.display_price %></p>
+    <%= form_with url: cart_path, method: :put do %>
+      <input type="hidden" name="product_id" value="<%= product.id %>">
+      <input class="input" type="number" name="quantity" value="1" min="1" style="width:90px">
+      <button class="button is-primary m-t-2">add to cart</button>
+    <% end %>
+  </div>
+</div>

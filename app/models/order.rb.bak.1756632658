@@ -1,0 +1,10 @@
+class Order < ApplicationRecord
+  def self.ransackable_attributes(auth_object = nil)
+    %w[id subtotal_cents taxes_cents total_cents status created_at updated_at placed_at]
+  end
+  def self.ransackable_associations(auth_object = nil)
+    %w[user order_items province]
+  end
+  belongs_to :user
+  belongs_to :province
+end

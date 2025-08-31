@@ -1,0 +1,12 @@
+<h1 class="title"><%= @category.name %></h1>
+
+<% if @products.any? %>
+  <div class="is-flex is-flex-wrap-wrap">
+    <% @products.each do |product| %>
+      <%= render partial: "products/product_card", locals: { product: product } %>
+    <% end %>
+  </div>
+  <div class="m-t-4"><%= paginate @products %></div>
+<% else %>
+  <div class="notification is-info">No products in this category.</div>
+<% end %>

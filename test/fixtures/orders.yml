@@ -1,0 +1,29 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  province: one
+  subtotal_cents: 1
+  gst_rate: 9.99
+  pst_rate: 9.99
+  hst_rate: 9.99
+  taxes_cents: 1
+  total_cents: 1
+  status: 1
+  stripe_payment_id: MyString
+  placed_at: 2025-08-31 01:49:43
+  shipping_address_json: MyText
+
+two:
+  user: two
+  province: two
+  subtotal_cents: 1
+  gst_rate: 9.99
+  pst_rate: 9.99
+  hst_rate: 9.99
+  taxes_cents: 1
+  total_cents: 1
+  status: 1
+  stripe_payment_id: MyString
+  placed_at: 2025-08-31 01:49:43
+  shipping_address_json: MyText

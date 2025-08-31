@@ -1,0 +1,65 @@
+class OrdersController < ApplicationController
+  before_action :authenticate_user!
+  before_action :set_provinces, only: [:new, :create]
+  before_action :load_cart,     only: [:new, :create]
+
+  def index
+    @orders = current_user.orders.order(created_at: :desc)
+  end
+
+  def show
+    @order = current_user.orders.find(params[:id])
+  end
+
+  def new
+    @order = current_user.orders.new
+  end
+
+  def create
+    @order = current_user.orders.new(order_params)
+    # TODO: compute totals/taxes, persist line items, etc.
+  end
+
+  private
+
+  def set_provinces
+    @provinces = Province.order(:name)
+  end
+# Build @cart_items, @cart_total_cents, and @subtotal_cents
+  def load_cart
+    cart = session[:cart] || {}
+    @cart_items = []
+    @cart_total_cents = 0
+
+    if cart.present?
+      products = Product.where(id: cart.keys).index_by { |p| p.id.to_s }
+      cart.each do |pid, qty|
+        qty = qty.to_i
+        next if qty <= 0
+
+        product = products[pid.to_s]
+        next unless product
+
+        unit_cents =
+          if product.respond_to?(:on_sale) && product.on_sale && product.respond_to?(:sale_price_cents) && product.sale_price_cents.to_i > 0
+            product.sale_price_cents.to_i
+          else
+            product.price_cents.to_i
+          end
+ line_cents = unit_cents * qty
+        @cart_items << { product: product, quantity: qty, unit_cents: unit_cents, line_cents: line_cents }
+        @cart_total_cents += line_cents
+      end
+    end
+
+    # make sure the view variable exists (even if cart is empty)
+    @subtotal_cents = @cart_total_cents
+  end
+
+  def order_params
+    params.require(:order).permit(
+      :first_name, :last_name, :address1, :address2, :city,
+      :postal_code, :country, :province_id
+    )
+  end
+end

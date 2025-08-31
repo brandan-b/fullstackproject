@@ -1,0 +1,24 @@
+<h1 class="title">Products</h1>
+
+<div class="tabs m-b-4">
+  <ul>
+    <li class="<%= 'is-active' unless params[:filter].present? %>"><%= link_to 'All', products_path %></li>
+    <li class="<%= 'is-active' if params[:filter] == 'on_sale' %>"><%= link_to 'On sale', products_path(filter: 'on_sale') %></li>
+    <li class="<%= 'is-active' if params[:filter] == 'new' %>"><%= link_to 'New', products_path(filter: 'new') %></li>
+    <li class="<%= 'is-active' if params[:filter] == 'recently_updated' %>"><%= link_to 'Recently updated', products_path(filter: 'recently_updated') %></li>
+  </ul>
+</div>
+
+<% if @products.any? %>
+  <div class="is-flex is-flex-wrap-wrap">
+    <% @products.each do |product| %>
+      <%= render partial: "products/product_card", locals: { product: product } %>
+    <% end %>
+  </div>
+
+  <div class="m-t-4">
+    <%= paginate @products %>
+  </div>
+<% else %>
+  <div class="notification is-info">No products to display.</div>
+<% end %>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>FullstackEcom</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <!-- Your app stylesheet (Propshaft) -->
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+
+    <!-- Bulma (CDN) so the storefront is styled immediately -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css" />
+
+    <!-- Turbo/Importmap so link_to method: :delete and other JS work -->
+    <%= javascript_importmap_tags %>
+  </head>
+ <body>
+    <%= render 'shared/flash' %>
+    <!-- Single navbar (uses your partial) -->
+    <%= render "layouts/navbar" %>
+
+    <section class="section">
+      <div class="container">
+    <%= render "shared/flash" %>
+        <%= yield %>
+      </div>
+    </section>
+  </body>
+</html>

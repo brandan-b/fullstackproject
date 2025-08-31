@@ -1,0 +1,40 @@
+class Product < ApplicationRecord
+  # Ransack allowlists for admin search
+  def self.ransackable_attributes(_ = nil)
+    %w[id title price_cents created_at updated_at]
+  end
+
+  def self.ransackable_associations(_ = nil)
+    %w[categories categorizations image_attachment image_blob]
+  end
+  # active storage for product image
+  has_one_attached :image
+
+  has_many :categorizations, dependent: :destroy
+  has_many :categories, through: :categorizations
+
+  validates :title, presence: true, length: { minimum: 3 }
+  validates :description, presence: true
+  validates :price_cents, presence: true, numericality: { only_integer: true, greater_than: 0 }
+  validates :sale_price_cents, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
+
+  scope :on_sale, -> { where(on_sale: true) }
+  scope :new_products, -> { where("created_at >= ?", 3.days.ago) }
+  scope :recently_updated, -> { where("updated_at >= ? AND created_at < ?", 3.days.ago, 3.days.ago) }
+def display_price_cents
+    on_sale && sale_price_cents.present? ? sale_price_cents : price_cents
+  end
+
+  def display_price
+    "$#{format('%.2f', display_price_cents.to_i / 100.0)}"
+  end
+
+  # ransack allowlist
+  def self.ransackable_attributes(_ = nil)
+    %w[id title description price_cents sale_price_cents on_sale created_at updated_at]
+  end
+
+  def self.ransackable_associations(_ = nil)
+    %w[categories]
+  end
+end

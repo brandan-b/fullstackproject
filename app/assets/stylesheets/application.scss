@@ -1,0 +1,10 @@
+/* comments: app styles compiled by dartsass */
+$brand: #4a90e2;
+
+.navbar.is-primary { background: $brand; }
+
+.m-t-2 { margin-top: .5rem; }
+.m-t-3 { margin-top: 1rem; }
+.m-l-2 { margin-left: .5rem; }
+
+.card { .card-content { min-height: 140px; } }

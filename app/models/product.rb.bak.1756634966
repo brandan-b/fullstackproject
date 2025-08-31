@@ -1,0 +1,17 @@
+class Product < ApplicationRecord
+  validates :title, presence: true
+  validates :price_cents, numericality: { greater_than_or_equal_to: 0, only_integer: true }
+
+  # convenience accessors used by views
+  def price
+    (price_cents || 0) / 100.0
+  end
+
+  def on_sale?
+    !!on_sale
+  end
+
+  def sale_price
+    (sale_price_cents || 0) / 100.0
+  end
+end

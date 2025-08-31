@@ -1,0 +1,24 @@
+class ProductsController < ApplicationController
+  def index
+    # comments: filters and pagination for list page
+    @categories = Category.order(:name)
+
+    # use active storage helper scope to avoid brittle includes
+    scope = Product.with_attached_image.order(created_at: :desc)
+
+    case params[:filter]
+    when "on_sale" then scope = scope.on_sale
+    when "new" then scope = scope.new_products
+    when "updated" then scope = scope.recently_updated
+    end
+if params[:category].present?
+      scope = scope.joins(:categories).where(categories: { slug: params[:category] })
+    end
+
+    @products = scope.page(params[:page]).per(12)
+  end
+
+  def show
+    @product = Product.find(params[:id])
+  end
+end

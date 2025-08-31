@@ -1,0 +1,40 @@
+<h1 class="title">your cart</h1>
+<% items = cart_items %>
+<% if items.empty? %>
+  <p>your cart is empty.</p>
+<% else %>
+  <table class="table is-fullwidth">
+    <thead><tr><th>product</th><th>qty</th><th>unit</th><th>line</th><th></th></tr></thead>
+    <tbody>
+      <% items.each do |ci| %>
+ <tr>
+          <td><%= link_to ci[:product].title, ci[:product] %></td>
+          <td>
+            <%= form_with url: cart_path, method: :put, class: "is-inline" do %>
+              <input type="hidden" name="product_id" value="<%= ci[:product].id %>">
+              <input class="input" type="number" name="quantity" value="<%= ci[:quantity] %>" min="0" style="width:80px">
+              <button class="button is-small m-l-2">update</button>
+            <% end %>
+          </td>
+          <td>$<%= "%.2f" % (ci[:unit_cents]/100.0) %></td>
+          <td>$<%= "%.2f" % (ci[:line_cents]/100.0) %></td>
+          <td>
+ <%= form_with url: cart_path, method: :put, class: "is-inline" do %>
+              <input type="hidden" name="product_id" value="<%= ci[:product].id %>">
+              <input type="hidden" name="quantity" value="0">
+              <button class="button is-light is-small">remove</button>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <p class="is-size-5">subtotal: $<%= "%.2f" % (cart_subtotal_cents/100.0) %></p>
+  <% if user_signed_in? %>
+    <%= link_to "checkout", new_order_path, class: "button is-primary m-t-3" %>
+  <% else %>
+    <%= link_to "login to checkout", new_user_session_path, class: "button is-primary m-t-3" %>
+  <% end %>
+
+  <%= button_to "clear cart", cart_path, method: :delete, class: "button is-light m-l-2" %>
+<% end %>

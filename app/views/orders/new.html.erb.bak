@@ -1,0 +1,106 @@
+<h1 class="title">Checkout</h1>
+
+<%= form_with model: @order, url: orders_path, local: true do |f| %>
+  <div class="box">
+    <h2 class="subtitle">Shipping address</h2>
+
+    <div class="columns">
+      <div class="column">
+        <div class="field">
+          <%= f.label :first_name, "First name", class: "label" %>
+          <div class="control">
+            <%= f.text_field :first_name, class: "input", required: true, placeholder: "Jane" %>
+          </div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="field">
+          <%= f.label :last_name, "Last name", class: "label" %>
+          <div class="control">
+  <%= f.text_field :last_name, class: "input", required: true, placeholder: "Doe" %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <%= f.label :address1, "Address line 1", class: "label" %>
+      <div class="control">
+        <%= f.text_field :address1, class: "input", required: true, placeholder: "123 Main St" %>
+      </div>
+    </div>
+
+    <div class="field">
+      <%= f.label :address2, "Address line 2 (optional)", class: "label" %>
+      <div class="control">
+   <%= f.text_field :address2, class: "input", placeholder: "Apt 4B" %>
+      </div>
+    </div>
+
+    <div class="columns">
+      <div class="column is-half">
+        <div class="field">
+          <%= f.label :city, "City", class: "label" %>
+          <div class="control">
+            <%= f.text_field :city, class: "input", required: true, placeholder: "Calgary" %>
+          </div>
+        </div>
+      </div>
+ <div class="column is-half">
+        <div class="field">
+          <%= f.label :postal_code, "Postal code", class: "label" %>
+          <div class="control">
+            <%= f.text_field :postal_code, class: "input", required: true, placeholder: "A1A 1A1" %>
+          </div>
+          <p class="help">Format: A1A 1A1</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="columns">
+      <div class="column is-half">
+        <div class="field">
+          <%= f.label :province_id, "Province", class: "label" %>
+ <div class="control">
+            <%= f.collection_select :province_id, @provinces, :id, :name, { include_blank: "Select a province" }, { class: "select" } %>
+          </div>
+        </div>
+      </div>
+      <div class="column is-half">
+        <div class="field">
+          <%= f.label :country, "Country", class: "label" %>
+          <div class="control">
+            <%= f.text_field :country, class: "input", required: true, placeholder: "Canada" %>
+          </div>
+        </div>
+      </div>
+</div>
+  </div>
+
+  <div class="box">
+    <h2 class="subtitle">Order summary</h2>
+
+    <% if @cart_items.present? %>
+      <ul class="content">
+        <% @cart_items.each do |ci| %>
+          <li>
+  <strong><%= ci[:product].try(:title) || ci[:product].try(:name) || "Item" %></strong>
+            × <%= ci[:quantity] %>
+            — <%= number_to_currency((ci[:line_cents].to_i / 100.0)) %>
+          </li>
+        <% end %>
+      </ul>
+      <p class="is-size-5">
+        Subtotal:
+        <strong><%= number_to_currency((@subtotal_cents.to_i / 100.0)) %></strong>
+      </p>
+    <% else %>
+      <p>Your cart is empty.</p>
+    <% end %>
+
+ <div class="buttons m-t-3">
+      <%= link_to "Back to cart", cart_path, class: "button" %>
+      <%= f.submit "Place order", class: "button is-primary" %>
+    </div>
+  </div>
+<% end %>

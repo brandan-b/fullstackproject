@@ -1,0 +1,5 @@
+<% flash.each do |type, msg| %>
+  <% next if msg.blank? %>
+  <% css = { notice: 'is-primary', alert: 'is-danger', error: 'is-danger', success: 'is-success' }[type.to_sym] || 'is-info' %>
+  <div class="notification <%= css %>"><%= msg %></div>
+<% end %>

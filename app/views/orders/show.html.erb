@@ -1,0 +1,42 @@
+<h1 class="title">Order #<%= @order.id %></h1>
+<p class="subtitle"><%= @order.status.to_s.titleize %> • placed <%= l(@order.placed_at, format: :long) rescue @order.created_at %></p>
+
+<h2 class="title is-5">Shipping</h2>
+<p><%= [@ship["first_name"], @ship["last_name"]].compact.join(" ") %></p>
+<p><%= @ship["address1"] %> <%= @ship["address2"] %></p>
+<p>
+  <%= @ship["city"] %>,
+  <%= Province.find_by(id: @ship["province_id"])&.name %>
+  <%= @ship["postal_code"] %>
+</p>
+<p><%= @ship["country"] %></p>
+
+<h2 class="title is-5 m-t-4">Items</h2>
+<table class="table is-fullwidth">
+ <thead>
+    <tr>
+      <th>Product</th>
+      <th class="has-text-right">Qty</th>
+      <th class="has-text-right">Unit</th>
+      <th class="has-text-right">Line</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @items.each do |item| %>
+      <tr>
+        <td><%= item.product&.title || item.product_name %></td>
+        <td class="has-text-right"><%= item.quantity %></td>
+        <td class="has-text-right"><%= number_to_currency(item.unit_price_cents/100.0) %></td>
+        <td class="has-text-right"><%= number_to_currency(item.line_cents/100.0) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<p class="has-text-right">Subtotal: <strong><%= number_to_currency(@order.subtotal_cents/100.0) %></strong></p>
+<p class="has-text-right">Taxes: <strong><%= number_to_currency(@order.taxes_cents/100.0) %></strong></p>
+<p class="has-text-right is-size-5">Total: <strong><%= number_to_currency(@order.total_cents/100.0) %></strong></p>
+
+<div class="m-t-4">
+  <%= link_to "Back to orders", orders_path, class: "button is-light" %>
+</div>

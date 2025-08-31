@@ -1,0 +1,41 @@
+<nav class="navbar is-primary" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <%= link_to "FullstackEcom", root_path, class: "navbar-item has-text-weight-bold" %>
+
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="main-navbar">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+<div id="main-navbar" class="navbar-menu">
+    <div class="navbar-start">
+      <%= link_to "Products", products_path, class: "navbar-item" %>
+      <%= link_to "Cart", cart_path, class: "navbar-item" %>
+      <% if user_signed_in? %>
+        <%= link_to "My Orders", orders_path, class: "navbar-item" %>
+      <% end %>
+    </div>
+<div class="navbar-end">
+      <% if user_signed_in? %>
+        <%= link_to "Sign out", destroy_user_session_path, method: :delete, class: "navbar-item" %>
+      <% else %>
+        <%= link_to "Sign in", new_user_session_path, class: "navbar-item" %>
+        <%= link_to "Sign up", new_user_registration_path, class: "navbar-item" %>
+      <% end %>
+    </div>
+  </div>
+</nav>
+<script>
+  // tiny burger toggle for Bulma
+  document.addEventListener('DOMContentLoaded', () => {
+    const $burger = document.querySelector('.navbar-burger');
+    const $menu = document.getElementById('main-navbar');
+    if ($burger && $menu) {
+      $burger.addEventListener('click', () => {
+        $burger.classList.toggle('is-active');
+        $menu.classList.toggle('is-active');
+      });
+    }
+  });
+</script>

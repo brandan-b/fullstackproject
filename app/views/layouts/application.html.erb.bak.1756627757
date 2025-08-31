@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>FullStack Ecom</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <!-- bulma from cdn -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <!-- our app css compiled by dartsass -->
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  </head>
+<body>
+    <nav class="navbar is-primary" role="navigation">
+      <div class="navbar-brand">
+        <%= link_to "store", root_path, class: "navbar-item has-text-weight-bold" %>
+        <a role="button" class="navbar-burger" data-target="navMenu" aria-label="menu" aria-expanded="false">
+          <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+        </a>
+      </div>
+      <div id="navMenu" class="navbar-menu">
+        <div class="navbar-start">
+          <%= link_to "about", page_path("about"), class: "navbar-item" %>
+          <%= link_to "contact", page_path("contact"), class: "navbar-item" %>
+        </div>
+        <div class="navbar-end">
+          <%= form_with url: search_path, method: :get, class: "navbar-item" do |f| %>
+            <div class="field has-addons">
+              <div class="control">
+                <div class="select">
+                  <select name="category">
+                    <option value="all">all</option>
+                    <% Category.order(:name).each do |c| %>
+                      <option value="<%= c.slug %>"><%= c.name %></option>
+                    <% end %>
+                  </select>
+                </div>
+              </div>
+ <div class="control">
+                <input class="input" type="text" name="q" placeholder="search products">
+              </div>
+              <div class="control">
+                <button class="button is-light" type="submit">search</button>
+              </div>
+            </div>
+          <% end %>
+          <%= link_to "cart (#{(session[:cart]||{}).values.map(&:to_i).sum})", cart_path, class: "navbar-item" %>
+          <% if user_signed_in? %>
+            <%= link_to "orders", orders_path, class: "navbar-item" %>
+            <%= link_to "logout", destroy_user_session_path, data: { turbo_method: :delete }, class: "navbar-item" %>
+          <% else %>
+            <%= link_to "login", new_user_session_path, class: "navbar-item" %>
+            <%= link_to "sign up", new_user_registration_path, class: "navbar-item" %>
+          <% end %>
+        </div>
+      </div>
+    </nav>
+
+    <section class="section">
+      <% flash.each do |k,v| %>
+        <div class="notification is-info"><%= v %></div>
+      <% end %>
+      <%= yield %>
+    </section>
+  </body>
+</html>
